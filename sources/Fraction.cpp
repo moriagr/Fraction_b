@@ -2,6 +2,9 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <algorithm> // For __gcd; taken from the internet
+#include <typeinfo>  // For typeid(...)
+
 using namespace std;
 
 #include "Fraction.hpp"
@@ -14,8 +17,12 @@ namespace ariel
         this->denominator = 1;
     }
 
-    Fraction::Fraction(int num, int den) : numerator(num), denominator(den)
+    Fraction::Fraction(int num, int den)
     {
+        int gcd_diff = __gcd(num, den);
+        // printf("%d:  ", gcd_diff);
+        this->numerator = num / gcd_diff;
+        this->denominator = den / gcd_diff;
     }
 
     Fraction::Fraction(float other)
@@ -25,7 +32,10 @@ namespace ariel
     }
     Fraction::Fraction(const Fraction &other)
     {
-        Fraction(other.numerator, other.denominator);
+        int gcd_diff = __gcd(other.getNumerator(), other.getDenominator());
+        // printf("%d:  ", gcd_diff);
+        this->numerator = other.getNumerator() / gcd_diff;
+        this->denominator = other.getDenominator() / gcd_diff;
     }
     int Fraction::getDenominator() const
     {
@@ -36,6 +46,15 @@ namespace ariel
         return numerator;
     }
 
+    void Fraction::setDenominator(int denominator)
+    {
+        this->denominator = denominator;
+    }
+    void Fraction::setNumerator(int numerator)
+    {
+        this->numerator = numerator;
+    }
+
     // Move constructor
     Fraction::Fraction(Fraction &&other) noexcept : numerator(other.numerator), denominator(other.denominator)
     {
@@ -43,12 +62,21 @@ namespace ariel
         other.numerator = 0;
         other.denominator = 1;
     }
-    Fraction &Fraction::operator=(const Fraction &other)
+    Fraction Fraction::operator=(const Fraction &other)
     {
+        if (this != &other)
+        {
+
+            this->numerator = other.getNumerator();
+            this->denominator = other.getDenominator();
+            int gcd_diff = __gcd(this->numerator, this->denominator);
+            this->numerator = this->numerator / gcd_diff;
+            this->denominator = this->denominator / gcd_diff;
+        }
         return *this;
     }
 
-    Fraction &Fraction::operator=(Fraction &&other) noexcept
+    Fraction Fraction::operator=(Fraction &&other) noexcept
     {
         return *this;
     }
@@ -56,25 +84,33 @@ namespace ariel
     {
     }
 
+    // pre-decrement
     Fraction Fraction::operator++()
     {
-        return Fraction(numerator, denominator);
+        numerator += denominator;
+        return *this;
     }
 
+    // post-decrement
     Fraction Fraction::operator++(int)
     {
-        return Fraction(numerator, denominator);
+        Fraction copy(*this);
+        numerator += denominator;
+        return copy;
     }
     // pre-decrement
     Fraction Fraction::operator--()
     {
-        return Fraction(numerator, denominator);
+        numerator -= denominator;
+        return *this;
     }
 
     // post-decrement
     Fraction Fraction::operator--(int)
     {
-        return Fraction(numerator, denominator);
+        Fraction copy(*this);
+        numerator -= denominator;
+        return copy;
     }
 
     std::ostream &operator<<(std::ostream &output, const Fraction &fraction)
@@ -82,58 +118,113 @@ namespace ariel
         return (output << fraction.getNumerator() << '/' << fraction.getDenominator());
     }
 
-    Fraction operator>>(std::istream &input, const Fraction &fraction)
+    Fraction &operator>>(std::istream &input, Fraction &fraction)
     {
 
+        int num, den;
+        char slash;
+        input >> num >> slash >> den;
+        fraction.setNumerator(num);
+        fraction.setDenominator(den);
+        
         return fraction;
     }
     Fraction operator*(const Fraction &fraction1, const Fraction &fraction2)
     {
-        return fraction1;
+        int num = fraction1.getNumerator() * fraction2.getNumerator();
+        int den = fraction1.getDenominator() * fraction2.getDenominator();
+        int gcd_diff = __gcd(num, den);
+
+        return Fraction(num / gcd_diff, den / gcd_diff);
     }
 
     Fraction operator/(const Fraction &fraction1, const Fraction &fraction2)
     {
-        return fraction1;
+        int num = fraction1.getNumerator() * fraction2.getDenominator();
+        int den = fraction1.getDenominator() * fraction2.getNumerator();
+        int gcd_diff = __gcd(num, den);
+
+        return Fraction(num / gcd_diff, den / gcd_diff);
     }
 
     Fraction operator+(const Fraction &fraction1, const Fraction &fraction2)
     {
-        return fraction1;
+        int num = fraction1.getNumerator() * fraction2.getDenominator() + fraction2.getNumerator() * fraction1.getDenominator();
+        int den = fraction1.getDenominator() * fraction2.getDenominator();
+        int gcd_diff = __gcd(num, den);
+
+        return Fraction(num / gcd_diff, den / gcd_diff);
     }
 
     Fraction operator-(const Fraction &fraction1, const Fraction &fraction2)
     {
-        return fraction1;
+        int num = fraction1.getNumerator() * fraction2.getDenominator() - fraction2.getNumerator() * fraction1.getDenominator();
+        int den = fraction1.getDenominator() * fraction2.getDenominator();
+        int gcd_diff = __gcd(num, den);
+
+        return Fraction(num / gcd_diff, den / gcd_diff);
     }
 
     bool operator==(const Fraction &fraction1, const Fraction &fraction2)
     {
+        if (fraction1.getDenominator() == fraction2.getDenominator() && fraction1.getNumerator() == fraction2.getNumerator())
+        {
+            return true;
+        }
         return false;
     }
 
     bool operator!=(const Fraction &fraction1, const Fraction &fraction2)
     {
+        if (fraction1.getDenominator() != fraction2.getDenominator() || fraction1.getNumerator() != fraction2.getNumerator())
+        {
+            return true;
+        }
         return false;
     }
 
     bool operator<(const Fraction &fraction1, const Fraction &fraction2)
     {
+
+        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        if (num1 < num2)
+        {
+            return true;
+        }
         return false;
     }
 
     bool operator>(const Fraction &fraction1, const Fraction &fraction2)
     {
+        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        if (num1 > num2)
+        {
+            return true;
+        }
         return false;
     }
 
     bool operator<=(const Fraction &fraction1, const Fraction &fraction2)
     {
+        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        if (num1 < num2 || fraction1.getDenominator() == fraction2.getDenominator() && fraction1.getNumerator() == fraction2.getNumerator())
+        {
+            return true;
+        }
         return false;
     }
 
     bool operator>=(const Fraction &fraction1, const Fraction &fraction2)
     {
+        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        if (num1 > num2 || fraction1.getDenominator() == fraction2.getDenominator() && fraction1.getNumerator() == fraction2.getNumerator())
+        {
+            return true;
+        }
         return false;
     }
 }

@@ -16,7 +16,7 @@ namespace ariel
         Fraction(float other);
 
         // Assignment operator
-        Fraction &operator=(const Fraction &other);
+        Fraction operator=(const Fraction &other);
 
         Fraction(int numerator, int denominator);
 
@@ -26,13 +26,16 @@ namespace ariel
         Fraction(const Fraction &other);
 
         // Move assignment operator
-        Fraction &operator=(Fraction &&other) noexcept;
+        Fraction operator=(Fraction &&other) noexcept;
 
         // Move constructor
         Fraction(Fraction &&other) noexcept;
 
         int getDenominator() const;
         int getNumerator() const;
+
+        void setDenominator(int denominator);
+        void setNumerator(int numerator);
 
         friend Fraction operator*(const Fraction &fraction1, const Fraction &fraction2);
 
@@ -54,11 +57,11 @@ namespace ariel
 
         friend bool operator>=(const Fraction &fraction1, const Fraction &fraction2);
 
-        Fraction operator++();
+        Fraction operator++(); // pre-decrement
         Fraction operator++(int); // post-increment
         Fraction operator--();    // pre-decrement
         Fraction operator--(int); // post-decrement
         friend std::ostream &operator<<(std::ostream &output, const Fraction &fraction);
-        friend Fraction operator>>(std::istream &input, const Fraction &fraction);
+        friend Fraction &operator>>(std::istream &input, Fraction &fraction);
     };
 }
