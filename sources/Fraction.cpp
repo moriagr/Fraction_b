@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <limits.h>
 #include <algorithm> // For __gcd; taken from the internet
 #include <typeinfo>  // For typeid(...)
 
@@ -19,6 +20,10 @@ namespace ariel
 
     Fraction::Fraction(int num, int den)
     {
+        if (den == 0)
+        {
+            throw std::invalid_argument("denominator can't be zero");
+        }
         int gcd_diff = __gcd(num, den);
         // printf("%d:  ", gcd_diff);
         this->numerator = num / gcd_diff;
@@ -64,20 +69,23 @@ namespace ariel
     }
     Fraction Fraction::operator=(const Fraction &other)
     {
-        if (this != &other)
-        {
 
-            this->numerator = other.getNumerator();
-            this->denominator = other.getDenominator();
-            int gcd_diff = __gcd(this->numerator, this->denominator);
-            this->numerator = this->numerator / gcd_diff;
-            this->denominator = this->denominator / gcd_diff;
-        }
+        this->numerator = other.getNumerator();
+        this->denominator = other.getDenominator();
+        int gcd_diff = __gcd(this->numerator, this->denominator);
+        this->numerator = this->numerator / gcd_diff;
+        this->denominator = this->denominator / gcd_diff;
         return *this;
     }
 
     Fraction Fraction::operator=(Fraction &&other) noexcept
     {
+        this->numerator = other.getNumerator();
+        this->denominator = other.getDenominator();
+        int gcd_diff = __gcd(this->numerator, this->denominator);
+        this->numerator = this->numerator / gcd_diff;
+        this->denominator = this->denominator / gcd_diff;
+
         return *this;
     }
     Fraction::~Fraction()
@@ -87,7 +95,7 @@ namespace ariel
     // pre-decrement
     Fraction Fraction::operator++()
     {
-        numerator += denominator;
+        this->numerator += this->denominator;
         return *this;
     }
 
@@ -95,13 +103,13 @@ namespace ariel
     Fraction Fraction::operator++(int)
     {
         Fraction copy(*this);
-        numerator += denominator;
+        this->numerator += this->denominator;
         return copy;
     }
     // pre-decrement
     Fraction Fraction::operator--()
     {
-        numerator -= denominator;
+        this->numerator -= this->denominator;
         return *this;
     }
 
@@ -109,7 +117,7 @@ namespace ariel
     Fraction Fraction::operator--(int)
     {
         Fraction copy(*this);
-        numerator -= denominator;
+        this->numerator -= this->denominator;
         return copy;
     }
 
@@ -120,15 +128,57 @@ namespace ariel
 
     Fraction &operator>>(std::istream &input, Fraction &fraction)
     {
-
         int num, den;
         char slash;
-        input >> num >> slash >> den;
+        input >> num;
+        if (input.peek() == '/')
+        {
+            input >> slash >> den;
+            if (isdigit(input.peek()))
+            {
+                input >> den;
+            }
+            else
+            {
+                throw std::logic_error("Trying to add fraction which isn't in the correct format");
+            }
+        }
+        else if (isspace(input.peek()))
+        {
+            input >> slash;
+            if (isdigit(slash))
+            {
+                den = slash - '0';
+            }
+            else if (isdigit(input.peek()))
+            {
+                input >> den;
+            }
+            else
+            {
+                throw std::logic_error("Trying to add fraction which isn't in the correct format");
+            }
+        }
+        else if (isdigit(input.peek()))
+        {
+            input >> den;
+        }
+        else
+        {
+            throw std::logic_error("Trying to add fraction which isn't in the correct format");
+        }
         fraction.setNumerator(num);
         fraction.setDenominator(den);
-        
         return fraction;
     }
+
+    Fraction &operator>>(Fraction &fraction1, Fraction &fraction2)
+    {
+        fraction1.setNumerator(fraction2.getNumerator());
+        fraction1.setDenominator(fraction2.getDenominator());
+        return fraction1;
+    }
+
     Fraction operator*(const Fraction &fraction1, const Fraction &fraction2)
     {
         int num = fraction1.getNumerator() * fraction2.getNumerator();
@@ -167,7 +217,9 @@ namespace ariel
 
     bool operator==(const Fraction &fraction1, const Fraction &fraction2)
     {
-        if (fraction1.getDenominator() == fraction2.getDenominator() && fraction1.getNumerator() == fraction2.getNumerator())
+        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        if (num1 == num2)
         {
             return true;
         }
@@ -176,7 +228,9 @@ namespace ariel
 
     bool operator!=(const Fraction &fraction1, const Fraction &fraction2)
     {
-        if (fraction1.getDenominator() != fraction2.getDenominator() || fraction1.getNumerator() != fraction2.getNumerator())
+        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        if (num1 != num2)
         {
             return true;
         }
@@ -210,7 +264,8 @@ namespace ariel
     {
         int num1 = fraction1.getNumerator() * fraction2.getDenominator();
         int num2 = fraction2.getNumerator() * fraction1.getDenominator();
-        if (num1 < num2 || fraction1.getDenominator() == fraction2.getDenominator() && fraction1.getNumerator() == fraction2.getNumerator())
+
+        if (num1 < num2 || num1 == num2)
         {
             return true;
         }
@@ -221,7 +276,7 @@ namespace ariel
     {
         int num1 = fraction1.getNumerator() * fraction2.getDenominator();
         int num2 = fraction2.getNumerator() * fraction1.getDenominator();
-        if (num1 > num2 || fraction1.getDenominator() == fraction2.getDenominator() && fraction1.getNumerator() == fraction2.getNumerator())
+        if (num1 > num2 || num1 == num2)
         {
             return true;
         }
