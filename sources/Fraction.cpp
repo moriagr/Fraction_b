@@ -131,7 +131,14 @@ namespace ariel
 
     std::ostream &operator<<(std::ostream &output, const Fraction &fraction)
     {
-        return (output << fraction.getNumerator() << '/' << fraction.getDenominator());
+        int num = fraction.getNumerator();
+        int den = fraction.getDenominator();
+        if (den < 0)
+        {
+            num = num * -1;
+            den = den * -1;
+        }
+        return (output << num << '/' << den);
     }
 
     std::istream &operator>>(std::istream &input, Fraction &fraction)
@@ -139,6 +146,7 @@ namespace ariel
         float num, den;
         char slash;
         input >> num;
+        // char* vf = input.
         if (input.fail())
         {
             return input;
@@ -204,7 +212,10 @@ namespace ariel
             den1 = den1 * -1;
             num1 = num * -1;
         }
+        
         cout << num1 << "/" << den1 << endl;
+        cout << input.peek() << endl;
+        cout << slash << endl;
         fraction.setNumerator(num1);
         fraction.setDenominator(den1);
 
@@ -276,6 +287,10 @@ namespace ariel
         {
             return fraction1;
         }
+        if (fraction1.getDenominator() == 0 || fraction2.getDenominator() == 0 || fraction2.getNumerator() == 0)
+        {
+            throw std::runtime_error("denominator can't be zero");
+        }
 
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
@@ -343,6 +358,10 @@ namespace ariel
 
     float transform2Float(const Fraction &fraction)
     {
+        if (fraction.getDenominator() == 0)
+        {
+            throw std::runtime_error("denominator can't be zero");
+        }
         float f1 = (float)fraction.getNumerator() / (float)fraction.getDenominator();
 
         std::stringstream stream;
