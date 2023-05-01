@@ -44,7 +44,6 @@ namespace ariel
         this->numerator = other.getNumerator() / gcd_diff;
 
         this->denominator = other.getDenominator() / gcd_diff;
-        
         if (this->denominator < 0)
         {
             this->denominator = this->denominator * -1;
@@ -200,6 +199,11 @@ namespace ariel
         {
             throw std::runtime_error("can't have float numerator in input");
         }
+        if (den1 < 0)
+        {
+            den1 = den1 * -1;
+            num1 = num * -1;
+        }
         cout << num1 << "/" << den1 << endl;
         fraction.setNumerator(num1);
         fraction.setDenominator(den1);
@@ -236,20 +240,29 @@ namespace ariel
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
 
-        if (fraction1.getNumerator() > max_int || fraction1.getNumerator() < min_int ||
-            fraction2.getNumerator() > max_int || fraction2.getNumerator() < min_int ||
-            fraction1.getDenominator() > max_int || fraction1.getDenominator() < min_int ||
-            fraction2.getDenominator() > max_int || fraction2.getDenominator() < min_int)
+        cout << fraction1 << endl;
+        cout << fraction2 << endl;
+        if (fraction1.getNumerator() == 1 && fraction1.getDenominator() == 1)
+        {
+            return fraction2;
+        }
+        if (fraction2.getNumerator() == 1 && fraction2.getDenominator() == 1)
+        {
+            return fraction1;
+        }
+        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
+            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
+            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
+            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
-
         long num = fraction1.getNumerator() * fraction2.getNumerator();
         long den = fraction1.getDenominator() * fraction2.getDenominator();
 
         int gcd_diff = __gcd(num, den);
 
-        if (num / gcd_diff > max_int || num / gcd_diff < min_int || den / gcd_diff > max_int || den / gcd_diff < min_int)
+        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
@@ -259,19 +272,24 @@ namespace ariel
 
     Fraction operator/(const Fraction &fraction1, const Fraction &fraction2)
     {
+        if (fraction2.getNumerator() == 1 && fraction2.getDenominator() == 1)
+        {
+            return fraction1;
+        }
+
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
-        if (fraction1.getNumerator() > max_int || fraction1.getNumerator() < min_int ||
-            fraction2.getNumerator() > max_int || fraction2.getNumerator() < min_int ||
-            fraction1.getDenominator() > max_int || fraction1.getDenominator() < min_int ||
-            fraction2.getDenominator() > max_int || fraction2.getDenominator() < min_int)
+        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
+            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
+            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
+            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
         long num = fraction1.getNumerator() * fraction2.getDenominator();
         long den = fraction1.getDenominator() * fraction2.getNumerator();
         int gcd_diff = __gcd(num, den);
-        if (num / gcd_diff > max_int || num / gcd_diff < min_int || den / gcd_diff > max_int || den / gcd_diff < min_int)
+        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
@@ -282,10 +300,10 @@ namespace ariel
     {
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
-        if (fraction1.getNumerator() > max_int || fraction1.getNumerator() < min_int ||
-            fraction2.getNumerator() > max_int || fraction2.getNumerator() < min_int ||
-            fraction1.getDenominator() > max_int || fraction1.getDenominator() < min_int ||
-            fraction2.getDenominator() > max_int || fraction2.getDenominator() < min_int)
+        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
+            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
+            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
+            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
@@ -293,7 +311,7 @@ namespace ariel
         long den = fraction1.getDenominator() * fraction2.getDenominator();
         int gcd_diff = __gcd(num, den);
 
-        if (num / gcd_diff > max_int || num / gcd_diff < min_int || den / gcd_diff > max_int || den / gcd_diff < min_int)
+        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
@@ -304,10 +322,10 @@ namespace ariel
     {
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
-        if (fraction1.getNumerator() > max_int || fraction1.getNumerator() < min_int ||
-            fraction2.getNumerator() > max_int || fraction2.getNumerator() < min_int ||
-            fraction1.getDenominator() > max_int || fraction1.getDenominator() < min_int ||
-            fraction2.getDenominator() > max_int || fraction2.getDenominator() < min_int)
+        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
+            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
+            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
+            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
@@ -315,7 +333,7 @@ namespace ariel
         long den = fraction1.getDenominator() * fraction2.getDenominator();
         int gcd_diff = __gcd(num, den);
 
-        if (num / gcd_diff > max_int || num / gcd_diff < min_int || den / gcd_diff > max_int || den / gcd_diff < min_int)
+        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
@@ -323,10 +341,23 @@ namespace ariel
         return Fraction(num / gcd_diff, den / gcd_diff);
     }
 
+    float transform2Float(const Fraction &fraction)
+    {
+        float f1 = (float)fraction.getNumerator() / (float)fraction.getDenominator();
+
+        std::stringstream stream;
+        stream << std::fixed << std::setprecision(3) << f1;
+        float new_f1;
+        stream >> new_f1;
+        return new_f1;
+    }
+
     bool operator==(const Fraction &fraction1, const Fraction &fraction2)
     {
-        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
-        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        float num1 = transform2Float(fraction1);
+        float num2 = transform2Float(fraction2);
+        // int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        // int num2 = fraction2.getNumerator() * fraction1.getDenominator();
         if (num1 == num2)
         {
             return true;
@@ -336,8 +367,10 @@ namespace ariel
 
     bool operator!=(const Fraction &fraction1, const Fraction &fraction2)
     {
-        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
-        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        float num1 = transform2Float(fraction1);
+        float num2 = transform2Float(fraction2);
+        // int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        // int num2 = fraction2.getNumerator() * fraction1.getDenominator();
         if (num1 != num2)
         {
             return true;
@@ -347,9 +380,10 @@ namespace ariel
 
     bool operator<(const Fraction &fraction1, const Fraction &fraction2)
     {
-
-        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
-        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        float num1 = transform2Float(fraction1);
+        float num2 = transform2Float(fraction2);
+        // int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        // int num2 = fraction2.getNumerator() * fraction1.getDenominator();
         if (num1 < num2)
         {
             return true;
@@ -359,8 +393,10 @@ namespace ariel
 
     bool operator>(const Fraction &fraction1, const Fraction &fraction2)
     {
-        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
-        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        float num1 = transform2Float(fraction1);
+        float num2 = transform2Float(fraction2);
+        // int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        // int num2 = fraction2.getNumerator() * fraction1.getDenominator();
         if (num1 > num2)
         {
             return true;
@@ -370,16 +406,18 @@ namespace ariel
 
     bool operator<=(const Fraction &fraction1, const Fraction &fraction2)
     {
-        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
-        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
-        if ((fraction1.getNumerator() < 0 || fraction1.getDenominator() < 0) && (fraction2.getNumerator() > 0 || fraction2.getDenominator() > 0))
-        {
-            return true;
-        }
-        if ((fraction2.getNumerator() < 0 || fraction2.getDenominator() < 0) && (fraction1.getNumerator() > 0 || fraction1.getDenominator() > 0))
-        {
-            return false;
-        }
+        // int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        // int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        // if ((fraction1.getNumerator() < 0 || fraction1.getDenominator() < 0) && (fraction2.getNumerator() > 0 || fraction2.getDenominator() > 0))
+        // {
+        //     return true;
+        // }
+        // if ((fraction2.getNumerator() < 0 || fraction2.getDenominator() < 0) && (fraction1.getNumerator() > 0 || fraction1.getDenominator() > 0))
+        // {
+        //     return false;
+        // }
+        float num1 = transform2Float(fraction1);
+        float num2 = transform2Float(fraction2);
 
         if (num1 < num2 || num1 == num2)
         {
@@ -390,17 +428,18 @@ namespace ariel
 
     bool operator>=(const Fraction &fraction1, const Fraction &fraction2)
     {
-        int num1 = fraction1.getNumerator() * fraction2.getDenominator();
-        int num2 = fraction2.getNumerator() * fraction1.getDenominator();
-        if ((fraction1.getNumerator() < 0 || fraction1.getDenominator() < 0) && (fraction2.getNumerator() > 0 || fraction2.getDenominator() > 0))
-        {
-            return false;
-        }
-        if ((fraction2.getNumerator() < 0 || fraction2.getDenominator() < 0) && (fraction1.getNumerator() > 0 || fraction1.getDenominator() > 0))
-        {
-            return true;
-        }
-
+        // int num1 = fraction1.getNumerator() * fraction2.getDenominator();
+        // int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        // if ((fraction1.getNumerator() < 0 || fraction1.getDenominator() < 0) && (fraction2.getNumerator() > 0 || fraction2.getDenominator() > 0))
+        // {
+        //     return false;
+        // }
+        // if ((fraction2.getNumerator() < 0 || fraction2.getDenominator() < 0) && (fraction1.getNumerator() > 0 || fraction1.getDenominator() > 0))
+        // {
+        //     return true;
+        // }
+        float num1 = transform2Float(fraction1);
+        float num2 = transform2Float(fraction2);
         if (num1 > num2 || num1 == num2)
         {
             return true;
