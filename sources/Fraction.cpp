@@ -143,14 +143,14 @@ namespace ariel
 
     std::istream &operator>>(std::istream &input, Fraction &fraction)
     {
-        float num, den;
+        float num, den, temp;
         char slash;
         input >> num;
         // char* vf = input.
-        if (input.fail())
-        {
-            return input;
-        }
+//        if (input.fail())
+//        {
+//            return input;
+//        }
 
         if (input.peek() == '/')
         {
@@ -161,20 +161,21 @@ namespace ariel
             }
             else
             {
-                throw std::logic_error("Trying to add fraction which isn't in the correct format");
+                throw std::logic_error("1Trying to add fraction which isn't in the correct format");
             }
         }
         else if (input.peek() == '.')
         {
-            throw std::runtime_error("can't have float numerator in input");
+            throw std::runtime_error("2can't have float numerator in input");
         }
         else if (isspace(input.peek()))
         {
 
-            input >> slash;
-            if (isdigit(slash))
+            input >> den;
+            int den1 = den;
+            if (isdigit(den) || den1 == den)
             {
-                den = slash - '0';
+                den = den;
             }
             else if (isdigit(input.peek()))
             {
@@ -182,7 +183,7 @@ namespace ariel
             }
             else
             {
-                throw std::logic_error("Trying to add fraction which isn't in the correct format");
+                throw std::logic_error("3Trying to add fraction which isn't in the correct format");
             }
         }
         else if (isdigit(input.peek()))
@@ -193,32 +194,28 @@ namespace ariel
         {
             if (input.peek() == -1)
             {
-                throw std::runtime_error("Something wrong ");
+                throw std::runtime_error("4Something wrong ");
             }
-            throw std::logic_error("Trying to add fraction which isn't in the correct format");
+            throw std::logic_error("5Trying to add fraction which isn't in the correct format");
         }
-        if (den == 0)
+        if (den == 0 || den == 0.0f)
         {
-            throw std::runtime_error("can't have denominator zero");
+            throw std::runtime_error("6can't have denominator zero");
         }
         int num1 = num;
         int den1 = den;
         if (num != num1 || den != den1)
         {
-            throw std::runtime_error("can't have float numerator in input");
+            throw std::runtime_error("7can't have float numerator in input");
         }
         if (den1 < 0)
         {
             den1 = den1 * -1;
             num1 = num * -1;
         }
-        
-        cout << num1 << "/" << den1 << endl;
-        cout << input.peek() << endl;
-        cout << slash << endl;
+
         fraction.setNumerator(num1);
         fraction.setDenominator(den1);
-
         return input;
     }
 
@@ -251,8 +248,8 @@ namespace ariel
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
 
-        cout << fraction1 << endl;
-        cout << fraction2 << endl;
+        // cout << fraction1 << endl;
+        // cout << fraction2 << endl;
         if (fraction1.getNumerator() == 1 && fraction1.getDenominator() == 1)
         {
             return fraction2;
