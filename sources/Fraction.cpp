@@ -5,6 +5,7 @@
 #include <limits>
 #include <algorithm> // For __gcd; taken from the internet
 #include <typeinfo>  // For typeid(...)
+#include <iomanip>
 
 using namespace std;
 
@@ -32,15 +33,23 @@ namespace ariel
 
     Fraction::Fraction(float other)
     {
-        this->numerator = other * 1000;
-        this->denominator = 1000;
+        int gcd_diff = __gcd((int)(other * 1000), 1000);
+        this->numerator = (other * 1000) / gcd_diff;
+        this->denominator = 1000 / gcd_diff;
     }
     Fraction::Fraction(const Fraction &other)
     {
         int gcd_diff = __gcd(other.getNumerator(), other.getDenominator());
         // printf("%d:  ", gcd_diff);
         this->numerator = other.getNumerator() / gcd_diff;
+
         this->denominator = other.getDenominator() / gcd_diff;
+        
+        if (this->denominator < 0)
+        {
+            this->denominator = this->denominator * -1;
+            this->numerator = this->numerator * -1;
+        }
     }
     int Fraction::getDenominator() const
     {
@@ -67,7 +76,7 @@ namespace ariel
         other.numerator = 0;
         other.denominator = 1;
     }
-    Fraction Fraction::operator=(const Fraction &other)
+    Fraction &Fraction::operator=(const Fraction &other)
     {
 
         this->numerator = other.getNumerator();
@@ -78,7 +87,7 @@ namespace ariel
         return *this;
     }
 
-    Fraction Fraction::operator=(Fraction &&other) noexcept
+    Fraction &Fraction::operator=(Fraction &&other) noexcept
     {
         this->numerator = other.getNumerator();
         this->denominator = other.getDenominator();
@@ -126,11 +135,16 @@ namespace ariel
         return (output << fraction.getNumerator() << '/' << fraction.getDenominator());
     }
 
-    Fraction &operator>>(std::istream &input, Fraction &fraction)
+    std::istream &operator>>(std::istream &input, Fraction &fraction)
     {
-        int num, den;
+        float num, den;
         char slash;
         input >> num;
+        if (input.fail())
+        {
+            return input;
+        }
+
         if (input.peek() == '/')
         {
             input >> slash >> den;
@@ -143,8 +157,13 @@ namespace ariel
                 throw std::logic_error("Trying to add fraction which isn't in the correct format");
             }
         }
+        else if (input.peek() == '.')
+        {
+            throw std::runtime_error("can't have float numerator in input");
+        }
         else if (isspace(input.peek()))
         {
+
             input >> slash;
             if (isdigit(slash))
             {
@@ -165,38 +184,72 @@ namespace ariel
         }
         else
         {
+            if (input.peek() == -1)
+            {
+                throw std::runtime_error("Something wrong ");
+            }
             throw std::logic_error("Trying to add fraction which isn't in the correct format");
         }
-        fraction.setNumerator(num);
-        fraction.setDenominator(den);
-        return fraction;
+        if (den == 0)
+        {
+            throw std::runtime_error("can't have denominator zero");
+        }
+        int num1 = num;
+        int den1 = den;
+        if (num != num1 || den != den1)
+        {
+            throw std::runtime_error("can't have float numerator in input");
+        }
+        cout << num1 << "/" << den1 << endl;
+        fraction.setNumerator(num1);
+        fraction.setDenominator(den1);
+
+        return input;
     }
 
-    Fraction &operator>>(Fraction &fraction1, Fraction &fraction2)
-    {
-        fraction1.setNumerator(fraction2.getNumerator());
-        fraction1.setDenominator(fraction2.getDenominator());
-        return fraction1;
-    }
+    // bool overflow_fun(const Fraction &fraction){
+    //     long
 
-    Fraction operator*(const Fraction &fraction1, const Fraction &fraction2)
+    // }
+
+    // Fraction &operator>>(Fraction &fraction1, Fraction &fraction2)
+    // {
+    //     cout << fraction1 << endl;
+    //     cout << fraction2 << endl;
+    //     if (fraction1.getDenominator() == 0)
+    //     {
+    //         throw std::runtime_error("can't have denominator zero");
+    //     }
+    //     fraction2.setNumerator(fraction1.getNumerator());
+    //     fraction2.setDenominator(fraction1.getDenominator());
+    //     if (fraction2.getDenominator() == 0)
+    //     {
+    //         throw std::runtime_error("can't have denominator zero");
+    //     }
+    //     return fraction1;
+    // }
+
+    Fraction
+    operator*(const Fraction &fraction1, const Fraction &fraction2)
     {
 
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
-        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
-            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
-            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
-            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
+
+        if (fraction1.getNumerator() > max_int || fraction1.getNumerator() < min_int ||
+            fraction2.getNumerator() > max_int || fraction2.getNumerator() < min_int ||
+            fraction1.getDenominator() > max_int || fraction1.getDenominator() < min_int ||
+            fraction2.getDenominator() > max_int || fraction2.getDenominator() < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
 
-        int num = fraction1.getNumerator() * fraction2.getNumerator();
-        int den = fraction1.getDenominator() * fraction2.getDenominator();
+        long num = fraction1.getNumerator() * fraction2.getNumerator();
+        long den = fraction1.getDenominator() * fraction2.getDenominator();
+
         int gcd_diff = __gcd(num, den);
 
-        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
+        if (num / gcd_diff > max_int || num / gcd_diff < min_int || den / gcd_diff > max_int || den / gcd_diff < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
@@ -208,17 +261,17 @@ namespace ariel
     {
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
-        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
-            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
-            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
-            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
+        if (fraction1.getNumerator() > max_int || fraction1.getNumerator() < min_int ||
+            fraction2.getNumerator() > max_int || fraction2.getNumerator() < min_int ||
+            fraction1.getDenominator() > max_int || fraction1.getDenominator() < min_int ||
+            fraction2.getDenominator() > max_int || fraction2.getDenominator() < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
-        int num = fraction1.getNumerator() * fraction2.getDenominator();
-        int den = fraction1.getDenominator() * fraction2.getNumerator();
+        long num = fraction1.getNumerator() * fraction2.getDenominator();
+        long den = fraction1.getDenominator() * fraction2.getNumerator();
         int gcd_diff = __gcd(num, den);
-        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
+        if (num / gcd_diff > max_int || num / gcd_diff < min_int || den / gcd_diff > max_int || den / gcd_diff < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
@@ -229,18 +282,18 @@ namespace ariel
     {
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
-        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
-            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
-            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
-            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
+        if (fraction1.getNumerator() > max_int || fraction1.getNumerator() < min_int ||
+            fraction2.getNumerator() > max_int || fraction2.getNumerator() < min_int ||
+            fraction1.getDenominator() > max_int || fraction1.getDenominator() < min_int ||
+            fraction2.getDenominator() > max_int || fraction2.getDenominator() < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
-        int num = fraction1.getNumerator() * fraction2.getDenominator() + fraction2.getNumerator() * fraction1.getDenominator();
-        int den = fraction1.getDenominator() * fraction2.getDenominator();
+        long num = fraction1.getNumerator() * fraction2.getDenominator() + fraction2.getNumerator() * fraction1.getDenominator();
+        long den = fraction1.getDenominator() * fraction2.getDenominator();
         int gcd_diff = __gcd(num, den);
 
-        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
+        if (num / gcd_diff > max_int || num / gcd_diff < min_int || den / gcd_diff > max_int || den / gcd_diff < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
@@ -251,18 +304,18 @@ namespace ariel
     {
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
-        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
-            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
-            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
-            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
+        if (fraction1.getNumerator() > max_int || fraction1.getNumerator() < min_int ||
+            fraction2.getNumerator() > max_int || fraction2.getNumerator() < min_int ||
+            fraction1.getDenominator() > max_int || fraction1.getDenominator() < min_int ||
+            fraction2.getDenominator() > max_int || fraction2.getDenominator() < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
-        int num = fraction1.getNumerator() * fraction2.getDenominator() - fraction2.getNumerator() * fraction1.getDenominator();
-        int den = fraction1.getDenominator() * fraction2.getDenominator();
+        long num = fraction1.getNumerator() * fraction2.getDenominator() - fraction2.getNumerator() * fraction1.getDenominator();
+        long den = fraction1.getDenominator() * fraction2.getDenominator();
         int gcd_diff = __gcd(num, den);
 
-        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
+        if (num / gcd_diff > max_int || num / gcd_diff < min_int || den / gcd_diff > max_int || den / gcd_diff < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
@@ -319,6 +372,14 @@ namespace ariel
     {
         int num1 = fraction1.getNumerator() * fraction2.getDenominator();
         int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        if ((fraction1.getNumerator() < 0 || fraction1.getDenominator() < 0) && (fraction2.getNumerator() > 0 || fraction2.getDenominator() > 0))
+        {
+            return true;
+        }
+        if ((fraction2.getNumerator() < 0 || fraction2.getDenominator() < 0) && (fraction1.getNumerator() > 0 || fraction1.getDenominator() > 0))
+        {
+            return false;
+        }
 
         if (num1 < num2 || num1 == num2)
         {
@@ -331,6 +392,15 @@ namespace ariel
     {
         int num1 = fraction1.getNumerator() * fraction2.getDenominator();
         int num2 = fraction2.getNumerator() * fraction1.getDenominator();
+        if ((fraction1.getNumerator() < 0 || fraction1.getDenominator() < 0) && (fraction2.getNumerator() > 0 || fraction2.getDenominator() > 0))
+        {
+            return false;
+        }
+        if ((fraction2.getNumerator() < 0 || fraction2.getDenominator() < 0) && (fraction1.getNumerator() > 0 || fraction1.getDenominator() > 0))
+        {
+            return true;
+        }
+
         if (num1 > num2 || num1 == num2)
         {
             return true;
@@ -338,3 +408,48 @@ namespace ariel
         return false;
     }
 }
+
+//  float f1 = (double)fraction1.getNumerator() / (double)fraction1.getDenominator();
+//         float f2 = (double)fraction2.getNumerator() / (double)fraction2.getDenominator();
+
+//         std::stringstream stream_f1;
+//         stream_f1 << std::fixed << std::setprecision(3) << f1;
+//         float new_f1;
+//         stream_f1 >> new_f1;
+
+//         std::stringstream stream_f2;
+//         stream_f2 << std::fixed << std::setprecision(3) << f2;
+//         float new_f2;
+//         stream_f2 >> new_f2;
+//         float sum = new_f1 - new_f2;
+
+//         std::stringstream stream_f3;
+
+//         stream_f3 << std::fixed << std::setprecision(3) << sum;
+//         float new_f3;
+//         stream_f3 >> new_f3;
+
+// if (fraction1.getDenominator() == 0 || fraction2.getDenominator() == 0 || fraction2.getNumerator() == 0)
+//         {
+//             throw std::runtime_error("denominator can't be zero");
+//         }
+
+//         float f1 = (double)fraction1.getNumerator() / (double)fraction1.getDenominator();
+//         float f2 = (double)fraction2.getNumerator() / (double)fraction2.getDenominator();
+
+//         std::stringstream stream_f1;
+//         stream_f1 << std::fixed << std::setprecision(3) << f1;
+//         float new_f1;
+//         stream_f1 >> new_f1;
+
+//         std::stringstream stream_f2;
+//         stream_f2 << std::fixed << std::setprecision(3) << f2;
+//         float new_f2;
+//         stream_f2 >> new_f2;
+//         float div = new_f1 / new_f2;
+
+//         std::stringstream stream_f3;
+
+//         stream_f3 << std::fixed << std::setprecision(3) << div;
+//         float new_f3;
+//         stream_f3 >> new_f3;
