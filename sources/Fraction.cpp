@@ -147,10 +147,10 @@ namespace ariel
         char slash;
         input >> num;
         // char* vf = input.
-//        if (input.fail())
-//        {
-//            return input;
-//        }
+        //        if (input.fail())
+        //        {
+        //            return input;
+        //        }
 
         if (input.peek() == '/')
         {
@@ -219,7 +219,7 @@ namespace ariel
         return input;
     }
 
-    Fraction    operator*(const Fraction &fraction1, const Fraction &fraction2)
+    Fraction operator*(const Fraction &fraction1, const Fraction &fraction2)
     {
 
         int max_int = std::numeric_limits<int>::max();
@@ -237,12 +237,12 @@ namespace ariel
         long long num = (long long)fraction1.getNumerator() * fraction2.getNumerator();
         long long den = (long long)fraction1.getDenominator() * fraction2.getDenominator();
 
-        if (num  > max_int || num < min_int || den > max_int || den < min_int)
+        if (num > max_int || num < min_int || den > max_int || den < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
 
-        return Fraction((int)num, (int)den );
+        return Fraction((int)num, (int)den);
     }
 
     Fraction operator/(const Fraction &fraction1, const Fraction &fraction2)
@@ -261,12 +261,12 @@ namespace ariel
 
         long long num = (long long)fraction1.getNumerator() * fraction2.getDenominator();
         long long den = (long long)fraction1.getDenominator() * fraction2.getNumerator();
-        if (num  > max_int || num < min_int || den > max_int || den < min_int)
+        if (num > max_int || num < min_int || den > max_int || den < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
 
-        return Fraction((int)num, (int)den );
+        return Fraction((int)num, (int)den);
     }
 
     Fraction operator+(const Fraction &fraction1, const Fraction &fraction2)
@@ -276,12 +276,12 @@ namespace ariel
 
         long long num = (long long)fraction1.getNumerator() * fraction2.getDenominator() + (long long)fraction2.getNumerator() * fraction1.getDenominator();
         long long den = (long long)fraction1.getDenominator() * fraction2.getDenominator();
-        if (num  > max_int || num < min_int || den > max_int || den < min_int)
+        if (num > max_int || num < min_int || den > max_int || den < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
 
-        return Fraction((int)num, (int)den );
+        return Fraction((int)num, (int)den);
     }
 
     Fraction operator-(const Fraction &fraction1, const Fraction &fraction2)
@@ -289,14 +289,14 @@ namespace ariel
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
 
-        long long num = (long long)fraction1.getNumerator() * fraction2.getDenominator() -(long long)(fraction2.getNumerator() * fraction1.getDenominator());
+        long long num = (long long)fraction1.getNumerator() * fraction2.getDenominator() - (long long)(fraction2.getNumerator() * fraction1.getDenominator());
         long long den = (long long)fraction1.getDenominator() * fraction2.getDenominator();
-        if (num  > max_int || num < min_int || den > max_int || den < min_int)
+        if (num > max_int || num < min_int || den > max_int || den < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
 
-        return Fraction((int)num, (int)den );
+        return Fraction((int)num, (int)den);
     }
 
     float transform2Float(const Fraction &fraction)
