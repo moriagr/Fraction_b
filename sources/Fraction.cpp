@@ -219,37 +219,12 @@ namespace ariel
         return input;
     }
 
-    // bool overflow_fun(const Fraction &fraction){
-    //     long
-
-    // }
-
-    // Fraction &operator>>(Fraction &fraction1, Fraction &fraction2)
-    // {
-    //     cout << fraction1 << endl;
-    //     cout << fraction2 << endl;
-    //     if (fraction1.getDenominator() == 0)
-    //     {
-    //         throw std::runtime_error("can't have denominator zero");
-    //     }
-    //     fraction2.setNumerator(fraction1.getNumerator());
-    //     fraction2.setDenominator(fraction1.getDenominator());
-    //     if (fraction2.getDenominator() == 0)
-    //     {
-    //         throw std::runtime_error("can't have denominator zero");
-    //     }
-    //     return fraction1;
-    // }
-
-    Fraction
-    operator*(const Fraction &fraction1, const Fraction &fraction2)
+    Fraction    operator*(const Fraction &fraction1, const Fraction &fraction2)
     {
 
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
 
-        // cout << fraction1 << endl;
-        // cout << fraction2 << endl;
         if (fraction1.getNumerator() == 1 && fraction1.getDenominator() == 1)
         {
             return fraction2;
@@ -258,24 +233,16 @@ namespace ariel
         {
             return fraction1;
         }
-        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
-            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
-            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
-            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
-        {
-            throw std::overflow_error("td::numeric_limits");
-        }
-        long num = fraction1.getNumerator() * fraction2.getNumerator();
-        long den = fraction1.getDenominator() * fraction2.getDenominator();
 
-        int gcd_diff = __gcd(num, den);
+        long long num = (long long)fraction1.getNumerator() * fraction2.getNumerator();
+        long long den = (long long)fraction1.getDenominator() * fraction2.getDenominator();
 
-        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
+        if (num  > max_int || num < min_int || den > max_int || den < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
 
-        return Fraction(num / gcd_diff, den / gcd_diff);
+        return Fraction((int)num, (int)den );
     }
 
     Fraction operator/(const Fraction &fraction1, const Fraction &fraction2)
@@ -291,66 +258,45 @@ namespace ariel
 
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
-        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
-            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
-            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
-            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
+
+        long long num = (long long)fraction1.getNumerator() * fraction2.getDenominator();
+        long long den = (long long)fraction1.getDenominator() * fraction2.getNumerator();
+        if (num  > max_int || num < min_int || den > max_int || den < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
-        long num = fraction1.getNumerator() * fraction2.getDenominator();
-        long den = fraction1.getDenominator() * fraction2.getNumerator();
-        int gcd_diff = __gcd(num, den);
-        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
-        {
-            throw std::overflow_error("td::numeric_limits");
-        }
-        return Fraction(num / gcd_diff, den / gcd_diff);
+
+        return Fraction((int)num, (int)den );
     }
 
     Fraction operator+(const Fraction &fraction1, const Fraction &fraction2)
     {
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
-        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
-            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
-            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
-            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
-        {
-            throw std::overflow_error("td::numeric_limits");
-        }
-        long num = fraction1.getNumerator() * fraction2.getDenominator() + fraction2.getNumerator() * fraction1.getDenominator();
-        long den = fraction1.getDenominator() * fraction2.getDenominator();
-        int gcd_diff = __gcd(num, den);
 
-        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
+        long long num = (long long)fraction1.getNumerator() * fraction2.getDenominator() + (long long)fraction2.getNumerator() * fraction1.getDenominator();
+        long long den = (long long)fraction1.getDenominator() * fraction2.getDenominator();
+        if (num  > max_int || num < min_int || den > max_int || den < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
-        return Fraction(num / gcd_diff, den / gcd_diff);
+
+        return Fraction((int)num, (int)den );
     }
 
     Fraction operator-(const Fraction &fraction1, const Fraction &fraction2)
     {
         int max_int = std::numeric_limits<int>::max();
         int min_int = std::numeric_limits<int>::min();
-        if (fraction1.getNumerator() >= max_int || fraction1.getNumerator() <= min_int ||
-            fraction2.getNumerator() >= max_int || fraction2.getNumerator() <= min_int ||
-            fraction1.getDenominator() >= max_int || fraction1.getDenominator() <= min_int ||
-            fraction2.getDenominator() >= max_int || fraction2.getDenominator() <= min_int)
-        {
-            throw std::overflow_error("td::numeric_limits");
-        }
-        long num = fraction1.getNumerator() * fraction2.getDenominator() - fraction2.getNumerator() * fraction1.getDenominator();
-        long den = fraction1.getDenominator() * fraction2.getDenominator();
-        int gcd_diff = __gcd(num, den);
 
-        if (num / gcd_diff >= max_int || num / gcd_diff <= min_int || den / gcd_diff >= max_int || den / gcd_diff <= min_int)
+        long long num = (long long)fraction1.getNumerator() * fraction2.getDenominator() -(long long)(fraction2.getNumerator() * fraction1.getDenominator());
+        long long den = (long long)fraction1.getDenominator() * fraction2.getDenominator();
+        if (num  > max_int || num < min_int || den > max_int || den < min_int)
         {
             throw std::overflow_error("td::numeric_limits");
         }
 
-        return Fraction(num / gcd_diff, den / gcd_diff);
+        return Fraction((int)num, (int)den );
     }
 
     float transform2Float(const Fraction &fraction)

@@ -67,7 +67,6 @@ TEST_CASE("Fraction multiplication test")
 {
     Fraction a(1, 2), b(1, 4);
     Fraction c = a * b;
-    cout << c << endl;
     CHECK(((c.getNumerator() == 1) && (c.getDenominator() == 8)));
     CHECK(__gcd(c.getNumerator(), c.getDenominator()) == 1);
 
